@@ -28,6 +28,6 @@ export interface Reservation {
   studentEmail: string;
   pickupDate: string;
   pickupTimeSlot: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'PICKED_UP';
   item?: ClothingItem; // Joined for UI convenience
 }

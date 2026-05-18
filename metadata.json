@@ -1,0 +1,6 @@
+{
+  "name": "ITU İrem Vardar Giysi Odası",
+  "description": "ITU İrem Vardar Giysi Odası Enformasyon Sistemi - Bağışçı, Öğrenci, Koordinatör ve Yönetici Panelleri içeren bir giysi bağış/rezervasyon platformu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

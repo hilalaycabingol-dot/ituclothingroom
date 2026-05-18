@@ -204,21 +204,35 @@ const Layout = ({ children, title }: { children: React.ReactNode, title: string 
 // --- Views ---
 
 const LoginView = () => {
-  const { loginUser } = useAppContext();
+  const { signInUser, signUpUser } = useAppContext();
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [isDonorMode, setIsDonorMode] = useState(false);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isDonorMode, setIsDonorMode] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoggingIn(true);
     try {
-      const result = await loginUser(email, password);
-      if (!result) {
-        setError('Geçersiz e-posta veya şifre.');
+      if (isSignUp) {
+        if (!selectedRole) return;
+        const result = await signUpUser(email, password, selectedRole);
+        if (result.error) {
+          setError(result.error);
+        } else {
+          // After successful signup, sign them in
+          await signInUser(email, password);
+        }
+      } else {
+        const result = await signInUser(email, password);
+        if (!result) {
+          setError('Geçersiz e-posta veya şifre.');
+        }
       }
     } catch (err) {
       setError('Bağlantı hatası. Lütfen tekrar deneyin.');
@@ -231,44 +245,89 @@ const LoginView = () => {
     return <DonorView onBack={() => setIsDonorMode(false)} />;
   }
 
+  if (!selectedRole) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#003865] p-6 relative overflow-hidden">
+        {/* Institutional Background Decoration */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 -rotate-12 translate-x-20 -translate-y-20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400/10 rotate-45 -translate-x-20 translate-y-20 rounded-full blur-3xl"></div>
+
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm z-10">
+          <Card className="p-8 shadow-2xl border-none ring-1 ring-white/10">
+            <div className="text-center mb-10">
+              <div className="bg-itu-blue w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5 shadow-xl shadow-itu-blue/30">
+                <ShoppingBag className="text-white w-7 h-7" />
+              </div>
+              <h1 className="text-xl font-black tracking-tighter text-slate-900 uppercase">İTÜ İrem Vardar</h1>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Giyim Odası Bilişim Platformu</p>
+            </div>
+            
+            <div className="space-y-4">
+              <Button variant="outline" className="w-full h-11 justify-between px-4" onClick={() => setSelectedRole('STUDENT')}>
+                <span className="flex items-center gap-2"><UserIcon className="w-4 h-4 text-itu-blue" /> Öğrenci Girişi</span>
+                <ChevronRight className="w-4 h-4 opacity-50" />
+              </Button>
+              <Button variant="outline" className="w-full h-11 justify-between px-4" onClick={() => setSelectedRole('COORDINATOR')}>
+                <span className="flex items-center gap-2"><Package className="w-4 h-4 text-itu-blue" /> Koordinatör Paneli</span>
+                <ChevronRight className="w-4 h-4 opacity-50" />
+              </Button>
+              <Button variant="outline" className="w-full h-11 justify-between px-4" onClick={() => setSelectedRole('ADMIN')}>
+                <span className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4 text-itu-blue" /> Yönetici Paneli</span>
+                <ChevronRight className="w-4 h-4 opacity-50" />
+              </Button>
+            </div>
+
+            <div className="mt-8 pt-8 border-t border-slate-100">
+              <p className="text-center text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4">Gönüllü İşlemleri</p>
+              <Button variant="secondary" className="w-full h-11" onClick={() => setIsDonorMode(true)}>
+                <Heart className="w-4 h-4 fill-white/20" />
+                <span className="uppercase tracking-widest text-[10px] font-black">Bağış Girişi</span>
+              </Button>
+            </div>
+          </Card>
+          <p className="text-center mt-8 text-[10px] text-white/50 font-medium tracking-wide uppercase">
+            İstanbul Teknik Üniversitesi
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#003865] p-6 relative overflow-hidden">
       {/* Institutional Background Decoration */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 -rotate-12 translate-x-20 -translate-y-20 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400/10 rotate-45 -translate-x-20 translate-y-20 rounded-full blur-3xl"></div>
 
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-sm z-10"
-      >
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm z-10">
         <Card className="p-8 shadow-2xl border-none ring-1 ring-white/10">
-          <div className="text-center mb-10">
-            <div className="bg-itu-blue w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5 shadow-xl shadow-itu-blue/30">
-              <ShoppingBag className="text-white w-7 h-7" />
-            </div>
-            <h1 className="text-xl font-black tracking-tighter text-slate-900 uppercase">İTÜ İrem Vardar</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Giyim Odası Bilişim Platformu</p>
+          <button className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 hover:text-itu-blue transition-colors" onClick={() => { setSelectedRole(null); setError(''); setIsSignUp(false); }}>
+            <ChevronRight className="w-4 h-4 rotate-180" /> Geri Dön
+          </button>
+          
+          <div className="text-center mb-8">
+            <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase">
+              {selectedRole === 'STUDENT' ? 'Öğrenci' : selectedRole === 'COORDINATOR' ? 'Koordinatör' : 'Yönetici'}<br/>
+              <span className="text-sm">{isSignUp ? 'Kayıt Ol' : 'Giriş Yap'}</span>
+            </h2>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">İrem Vardar Giyim Odası</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-4">
             {error && <p className="text-[10px] text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-100 font-bold uppercase tracking-tight">{error}</p>}
             <Input label="E-posta" type="email" value={email} onChange={(e: any) => setEmail(e.target.value)} placeholder="name@itu.edu.tr" required />
             <Input label="Şifre" type="password" value={password} onChange={(e: any) => setPassword(e.target.value)} placeholder="••••••••" required />
-            <Button type="submit" variant="itu" className="w-full h-11 text-xs font-black uppercase tracking-widest mt-2" disabled={isLoggingIn}>{isLoggingIn ? 'Bağlanıyor...' : 'Sisteme Bağlan'}</Button>
+            <Button type="submit" variant="itu" className="w-full h-11 text-xs font-black uppercase tracking-widest mt-2" disabled={isLoggingIn}>
+              {isLoggingIn ? (isSignUp ? 'Kaydediliyor...' : 'Bağlanıyor...') : (isSignUp ? 'Hesap Oluştur' : 'Sisteme Bağlan')}
+            </Button>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-slate-100">
-            <p className="text-center text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4">Gönüllü İşlemleri</p>
-            <Button variant="secondary" className="w-full h-11" onClick={() => setIsDonorMode(true)}>
-              <Heart className="w-4 h-4 fill-white/20" />
-              <span className="uppercase tracking-widest text-[10px] font-black">Bağış Girişi</span>
-            </Button>
+          <div className="mt-6 text-center border-t border-slate-100 pt-6">
+            <button type="button" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-itu-blue transition-colors" onClick={() => { setIsSignUp(!isSignUp); setError(''); }}>
+              {isSignUp ? 'Zaten hesabınız var mı? Giriş yapın' : 'Hesabınız yok mu? Kayıt olun'}
+            </button>
           </div>
         </Card>
-        <p className="text-center mt-8 text-[10px] text-white/50 font-medium tracking-wide uppercase">
-          İstanbul Teknik Üniversitesi
-        </p>
       </motion.div>
     </div>
   );
@@ -598,11 +657,12 @@ const StudentView = () => {
 };
 
 const CoordinatorView = () => {
-  const { reservations, inventory, updateReservationStatus } = useAppContext();
+  const { reservations, inventory, updateReservationStatus, confirmPickup } = useAppContext();
+  const [activeTab, setActiveTab] = useState<'PENDING' | 'APPROVED'>('PENDING');
 
-  const pending = useMemo(() => 
-    reservations.filter(r => r.status === 'PENDING'),
-    [reservations]
+  const displayedReservations = useMemo(() => 
+    reservations.filter(r => r.status === activeTab),
+    [reservations, activeTab]
   );
 
   return (
@@ -611,7 +671,7 @@ const CoordinatorView = () => {
       <div className="grid grid-cols-4 gap-4 shrink-0">
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Bekleyen Onay</p>
-          <p className="text-2xl font-bold text-orange-500 mt-1">{pending.length}</p>
+          <p className="text-2xl font-bold text-orange-500 mt-1">{reservations.filter(r => r.status === 'PENDING').length}</p>
           <p className="text-[10px] text-slate-500 font-medium mt-1 italic">Bugün işlenmesi gereken</p>
         </div>
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -634,9 +694,18 @@ const CoordinatorView = () => {
       <div className="bg-white rounded-xl border border-slate-200 flex flex-col overflow-hidden shadow-sm">
         <div className="h-12 border-b border-slate-100 flex items-center justify-between px-4 bg-slate-50/50">
           <div className="flex gap-6">
-            <button className="text-[10px] font-black text-itu-blue border-b-2 border-itu-blue h-12 px-2 uppercase tracking-widest">Bekleyen Talepler ({pending.length})</button>
-            <button className="text-[10px] font-bold text-slate-400 h-12 px-2 uppercase tracking-widest hover:text-slate-600 transition-colors">Tüm Rezervasyonlar</button>
-            <button className="text-[10px] font-bold text-slate-400 h-12 px-2 uppercase tracking-widest hover:text-slate-600 transition-colors">İstatistikler</button>
+            <button 
+              className={`text-[10px] font-black h-12 px-2 uppercase tracking-widest transition-colors ${activeTab === 'PENDING' ? 'text-itu-blue border-b-2 border-itu-blue' : 'text-slate-400 hover:text-slate-600'}`}
+              onClick={() => setActiveTab('PENDING')}
+            >
+              Gelen Rezervasyon İstekleri ({reservations.filter(r => r.status === 'PENDING').length})
+            </button>
+            <button 
+              className={`text-[10px] font-black h-12 px-2 uppercase tracking-widest transition-colors ${activeTab === 'APPROVED' ? 'text-itu-blue border-b-2 border-itu-blue' : 'text-slate-400 hover:text-slate-600'}`}
+              onClick={() => setActiveTab('APPROVED')}
+            >
+              Onaylı - Teslim Bekleyenler ({reservations.filter(r => r.status === 'APPROVED').length})
+            </button>
           </div>
           <div className="relative">
             <input 
@@ -658,14 +727,14 @@ const CoordinatorView = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {pending.length === 0 ? (
+              {displayedReservations.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-20 text-center font-bold text-slate-300 italic text-xs uppercase tracking-widest">
-                    Yeni bir talep kaydı bulunmamaktadır.
+                    Bu kategoride kayıt bulunmamaktadır.
                   </td>
                 </tr>
               ) : (
-                pending.map(res => {
+                displayedReservations.map(res => {
                   const item = inventory.find(i => i.id === res.item?.id || i.id === res.itemId);
                   return (
                     <tr key={res.id} className="hover:bg-slate-50 transition-colors">
@@ -697,12 +766,20 @@ const CoordinatorView = () => {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="danger" className="w-8 h-8 p-0" onClick={() => updateReservationStatus(res.id, 'REJECTED')} title="Reddet">
-                            <XCircle className="w-4 h-4" />
-                          </Button>
-                          <Button variant="secondary" className="h-8 px-4 font-black uppercase tracking-widest text-[9px]" onClick={() => updateReservationStatus(res.id, 'APPROVED')}>
-                            ONAYLA
-                          </Button>
+                          {activeTab === 'PENDING' ? (
+                            <>
+                              <Button variant="danger" className="h-8 px-3 font-black uppercase tracking-widest text-[9px]" onClick={() => updateReservationStatus(res.id, 'REJECTED')} title="Reddet">
+                                REDDET
+                              </Button>
+                              <Button variant="secondary" className="h-8 px-4 font-black uppercase tracking-widest text-[9px]" onClick={() => updateReservationStatus(res.id, 'APPROVED')}>
+                                ONAYLA
+                              </Button>
+                            </>
+                          ) : (
+                            <Button variant="itu" className="h-8 px-4 font-black uppercase tracking-widest text-[9px]" onClick={() => confirmPickup(res.id)}>
+                              TESLİM EDİLDİ
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>

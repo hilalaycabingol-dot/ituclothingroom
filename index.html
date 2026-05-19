@@ -1,16 +1,670 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="İTÜ İrem Vardar Giyim Odası - Bağış ve Rezervasyon Platformu" />
-    <title>İTÜ İrem Vardar Giyim Odası</title>
-    <!-- Supabase JS Client via CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  </head>
-  <body>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İTÜ İrem Vardar Giysi Odası</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #003865; }
+        .itu-blue { background-color: #003865; }
+        .itu-text { color: #003865; }
+    </style>
+</head>
+<body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+    <script type="text/babel">
+        const { useState, useEffect, createContext, useContext } = React;
+ 
+        const translations = {
+            tr: {
+                title: "İTÜ İREM VARDAR",
+                subtitle: "GİYİM ODASI BİLİŞİM PLATFORMU",
+                email: "E-POSTA",
+                password: "ŞİFRE",
+                loginBtn: "SİSTEME BAĞLAN",
+                invalidAuth: "GEÇERSİZ E-POSTA VEYA ŞİFRE.",
+                donorOp: "GÖNÜLLÜ İŞLEMLERİ",
+                donorBtn: "BAĞIŞ GİRİŞİ",
+                langToggle: "EN",
+                inventory: "Envanter",
+                reserve: "Rezerve Et",
+                activeRes: "Aktif Rezervasyonlar",
+                limitReached: "Maksimum 3 ürün sınırına ulaştınız!",
+                category: "Kategori",
+                size: "Beden",
+                status: "Durum",
+                confirmPickup: "Teslimatı Onayla",
+                markNoShow: "Gelmedi İşaretle",
+                batchTrack: "Toplu Giriş (Track 1)",
+                barcodeTrack: "Tekil Barkod (Track 2)",
+                kpis: "Yönetici İstatistikleri",
+                logout: "Çıkış Yap",
+                backHome: "Giriş Ekranına Dön",
+                categories: { 1: "Üst Giyim", 2: "Alt Giyim", 3: "Dış Giyim", 4: "Ayakkabı", 5: "Aksesuar" }
+            },
+            en: {
+                title: "ITU IREM VARDAR",
+                subtitle: "CLOTHING ROOM PLATFORM",
+                email: "EMAIL",
+                password: "PASSWORD",
+                loginBtn: "LOGIN TO SYSTEM",
+                invalidAuth: "INVALID EMAIL OR PASSWORD.",
+                donorOp: "VOLUNTEER OPERATIONS",
+                donorBtn: "DONATION ENTRY",
+                langToggle: "TR",
+                inventory: "Inventory",
+                reserve: "Reserve",
+                activeRes: "Active Reservations",
+                limitReached: "You reached the 3-item reservation limit!",
+                category: "Category",
+                size: "Size",
+                status: "Status",
+                confirmPickup: "Confirm Pickup",
+                markNoShow: "Mark No-Show",
+                batchTrack: "Batch Intake (Track 1)",
+                barcodeTrack: "Barcode Intake (Track 2)",
+                kpis: "Admin Analytics",
+                logout: "Logout",
+                backHome: "Back to Login",
+                categories: { 1: "Tops", 2: "Bottoms", 3: "Outerwear", 4: "Shoes", 5: "Accessories" }
+            }
+        };
+ 
+        const LanguageContext = createContext();
+        const AuthContext = createContext();
+        const GlobalStateContext = createContext();
+ 
+        const INITIAL_INVENTORY = [
+            { id: 1, cat: 3, size: 'L', gender: 'Unisex', type: 'barcode', code: 'ITU-COAT-101', status: 'Available' },
+            { id: 2, cat: 1, size: 'M', gender: 'Female', type: 'batch', qty: 12, status: 'Available' },
+            { id: 3, cat: 4, size: '42', gender: 'Male', type: 'barcode', code: 'ITU-BOOT-202', status: 'Available' },
+            { id: 4, cat: 2, size: 'S', gender: 'Unisex', type: 'batch', qty: 5, status: 'Available' },
+            { id: 5, cat: 3, size: 'M', gender: 'Female', type: 'barcode', code: 'ITU-COAT-105', status: 'Available' },
+            { id: 6, cat: 1, size: 'XL', gender: 'Male', type: 'batch', qty: 8, status: 'Available' },
+        ];
 
+        const INITIAL_QUEUE = [
+            { id: 1, studentCode: 'STU-100342', items: 'Winter Coat (ITU-COAT-101)', time: '10:30', date: 'Today' },
+            { id: 2, studentCode: 'STU-100551', items: 'Batch Top ×1', time: '11:00', date: 'Today' }
+        ];
+ 
+        const Icon = ({ name, className = "w-6 h-6" }) => {
+            const ref = React.useRef(null);
+            useEffect(() => {
+                if (ref.current) {
+                    ref.current.innerHTML = '';
+                    const icon = document.createElement('i');
+                    icon.setAttribute('data-lucide', name);
+                    icon.className = className;
+                    ref.current.appendChild(icon);
+                    lucide.createIcons({ nodes: [icon] });
+                }
+            }, [name, className]);
+            return <span ref={ref}></span>;
+        };
+ 
+        const Header = () => {
+            const { t, toggleLang } = useContext(LanguageContext);
+            const { user, logout, setPage } = useContext(AuthContext);
+            return (
+                <header className="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => { logout(); setPage('landing'); }}>
+                        <div className="w-10 h-10 itu-blue rounded-xl flex items-center justify-center text-white font-bold shadow-md">
+                            <Icon name="shopping-bag" className="w-5 h-5" />
+                        </div>
+                        <h1 className="font-extrabold text-xl itu-text hidden sm:block tracking-tight">{t.title}</h1>
+                    </div>
+                    <div className="flex gap-3 items-center">
+                        {user && (
+                            <span className="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full hidden sm:block uppercase">
+                                {user.role}
+                            </span>
+                        )}
+                        <button onClick={toggleLang} className="px-3 py-1.5 border rounded-lg hover:bg-gray-50 text-sm font-bold transition-colors">{t.langToggle}</button>
+                        {user && (
+                            <button onClick={() => { logout(); setPage('landing'); }}
+                                className="px-4 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm font-bold border border-red-100 flex items-center gap-2 hover:bg-red-100 transition-colors">
+                                <Icon name="log-out" className="w-4 h-4" />
+                                <span className="hidden sm:block">{t.logout}</span>
+                            </button>
+                        )}
+                    </div>
+                </header>
+            );
+        };
+ 
+        const LandingPage = () => {
+            const { t } = useContext(LanguageContext);
+            const { login, setPage } = useContext(AuthContext);
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState(false);
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                setError(false);
+                
+                // HARDCODED AUTHENTICATION LOGIC
+                if (email === 'bingolh23@itu.edu.tr' && password === 'bingolh23') {
+                    login('student');
+                } else if (email === 'coord@itu.edu.tr' && password === 'coord123') {
+                    login('coordinator');
+                } else if (email === 'bingola23@itu.edu.tr' && password === 'bingola23') {
+                    login('admin');
+                } else {
+                    setError(true);
+                }
+            };
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen text-center px-4" style={{ backgroundColor: '#003865' }}>
+                    <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md">
+                        
+                        <div className="w-16 h-16 itu-blue rounded-2xl flex items-center justify-center text-white font-bold mx-auto mb-6 shadow-lg">
+                            <Icon name="shopping-bag" className="w-8 h-8" />
+                        </div>
+                        
+                        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">{t.title}</h2>
+                        <p className="text-xs font-bold text-gray-400 mt-1 mb-8 tracking-widest">{t.subtitle}</p>
+
+                        {error && (
+                            <div className="bg-red-50 text-red-600 text-sm font-bold p-3 rounded-lg mb-6 border border-red-100">
+                                {t.invalidAuth}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleLogin} className="space-y-5">
+                            <div className="text-left">
+                                <label className="text-xs font-bold text-gray-500 ml-1">{t.email}</label>
+                                <div className="relative mt-1">
+                                    <input 
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full p-3.5 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#003865] focus:bg-white transition-all font-medium" 
+                                        placeholder="ornek@itu.edu.tr"
+                                        required 
+                                    />
+                                    <Icon name="user" className="w-5 h-5 absolute right-4 top-4 text-gray-400" />
+                                </div>
+                            </div>
+
+                            <div className="text-left">
+                                <label className="text-xs font-bold text-gray-500 ml-1">{t.password}</label>
+                                <div className="relative mt-1">
+                                    <input 
+                                        type="password" 
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full p-3.5 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#003865] focus:bg-white transition-all font-medium" 
+                                        placeholder="••••••••"
+                                        required 
+                                    />
+                                    <Icon name="key" className="w-5 h-5 absolute right-4 top-4 text-gray-400" />
+                                </div>
+                            </div>
+
+                            <button type="submit" className="w-full itu-blue text-white font-bold p-4 rounded-xl hover:bg-blue-900 transition-colors shadow-md mt-2">
+                                {t.loginBtn}
+                            </button>
+                        </form>
+
+                        <div className="my-8 border-t border-gray-100 relative">
+                            <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-xs font-bold text-gray-400 tracking-wider">
+                                {t.donorOp}
+                            </span>
+                        </div>
+
+                        <button 
+                            onClick={() => setPage('donor')}
+                            className="w-full bg-[#34a853] text-white font-bold p-4 rounded-xl hover:bg-green-600 transition-colors shadow-md flex items-center justify-center gap-2">
+                            <Icon name="heart" className="w-5 h-5" /> {t.donorBtn}
+                        </button>
+                    </div>
+
+                    <p className="mt-8 text-xs font-medium text-blue-200/50 uppercase tracking-widest">İstanbul Teknik Üniversitesi</p>
+                </div>
+            );
+        };
+ 
+        const StudentDashboard = () => {
+            const { t, lang } = useContext(LanguageContext);
+            const { inventory, myRes, setMyRes, queue, setQueue } = useContext(GlobalStateContext);
+            const [filterCat, setFilterCat] = useState(0);
+ 
+            const handleReserve = (item) => {
+                if (myRes.length >= 3) return alert(t.limitReached);
+                const newRes = { ...item, resId: Date.now(), resStatus: 'Pending', slot: '13:00 - Today' };
+                setMyRes([...myRes, newRes]);
+                
+                // Add to Coordinator Queue automatically for demo
+                const queueItem = {
+                    id: Date.now(),
+                    studentCode: 'STU-BINGOL',
+                    items: `${t.categories[item.cat]} (${item.size})`,
+                    time: '13:00',
+                    date: 'Today'
+                };
+                setQueue([...queue, queueItem]);
+                alert("Rezervasyon başarıyla oluşturuldu! Lütfen randevu saatinde teslim alınız.");
+            };
+ 
+            const filtered = filterCat === 0 ? inventory : inventory.filter(i => i.cat === filterCat);
+            const cats = [
+                { id: 0, tr: 'Tümü', en: 'All' },
+                { id: 1, tr: 'Üst Giyim', en: 'Tops' },
+                { id: 2, tr: 'Alt Giyim', en: 'Bottoms' },
+                { id: 3, tr: 'Dış Giyim', en: 'Outerwear' },
+                { id: 4, tr: 'Ayakkabı', en: 'Shoes' },
+                { id: 5, tr: 'Aksesuar', en: 'Accessories' },
+            ];
+ 
+            return (
+                <div className="p-6 max-w-6xl mx-auto bg-gray-50 min-h-screen">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-gray-800">{t.inventory}</h2>
+                        <div className={`px-4 py-2 rounded-xl font-bold border text-sm shadow-sm ${myRes.length >= 3 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
+                            {myRes.length}/3 {t.activeRes}
+                        </div>
+                    </div>
+ 
+                    {/* Category filter */}
+                    <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                        {cats.map(c => (
+                            <button key={c.id} onClick={() => setFilterCat(c.id)}
+                                className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all shadow-sm ${filterCat === c.id ? 'bg-[#003865] text-white' : 'bg-white border-2 border-gray-100 text-gray-600 hover:border-gray-300'}`}>
+                                {lang === 'tr' ? c.tr : c.en}
+                            </button>
+                        ))}
+                    </div>
+ 
+                    <div className="grid lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2 space-y-4">
+                            {filtered.map(item => {
+                                const alreadyReserved = myRes.find(r => r.id === item.id);
+                                return (
+                                    <div key={item.id} className="bg-white p-5 rounded-2xl border-2 border-gray-100 flex justify-between items-center shadow-sm hover:border-blue-200 transition-colors">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1.5">
+                                                <h4 className="font-extrabold text-gray-900">{t.categories[item.cat]}</h4>
+                                                {item.type === 'barcode' && <span className="text-[10px] bg-purple-50 text-purple-700 px-2.5 py-1 rounded-md font-bold tracking-wider">BARKODLU</span>}
+                                                {item.type === 'batch' && <span className="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md font-bold tracking-wider">TOPLU ×{item.qty}</span>}
+                                            </div>
+                                            <p className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                                                <Icon name="tag" className="w-4 h-4" /> Beden: {item.size} | {item.gender}
+                                            </p>
+                                        </div>
+                                        <button
+                                            disabled={myRes.length >= 3 || !!alreadyReserved}
+                                            onClick={() => handleReserve(item)}
+                                            className="itu-blue text-white px-6 py-2.5 rounded-xl font-bold disabled:opacity-30 disabled:bg-gray-400 hover:bg-blue-800 transition-colors text-sm shadow-md flex items-center gap-2">
+                                            {alreadyReserved ? <><Icon name="check" className="w-4 h-4"/> Eklendi</> : <><Icon name="plus" className="w-4 h-4"/> {t.reserve}</>}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+ 
+                        <div>
+                            <div className="bg-white p-6 rounded-2xl border-2 border-gray-100 shadow-sm sticky top-24">
+                                <h3 className="font-bold text-gray-400 uppercase text-xs tracking-widest mb-4 flex items-center gap-2">
+                                    <Icon name="shopping-bag" className="w-4 h-4" /> {t.activeRes}
+                                </h3>
+                                {myRes.length === 0 && <p className="text-gray-400 italic text-sm text-center py-8">Henüz rezervasyonunuz bulunmuyor.</p>}
+                                <div className="space-y-3">
+                                    {myRes.map(res => (
+                                        <div key={res.resId} className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="font-bold text-emerald-900 text-sm">{t.categories[res.cat]}</p>
+                                                    <p className="text-xs font-medium text-emerald-700 mt-1">{t.size}: {res.size} | Seçilen Saat: 13:00</p>
+                                                </div>
+                                                <button onClick={() => setMyRes(myRes.filter(r => r.resId !== res.resId))}
+                                                    className="text-emerald-400 hover:text-red-500 transition-colors bg-white rounded-full p-1 shadow-sm">
+                                                    <Icon name="x" className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            <div className="mt-3 flex items-center gap-1 text-[10px] bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-md font-bold w-fit">
+                                                <Icon name="clock" className="w-3 h-3" /> ONAY BEKLİYOR
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+ 
+        const CoordinatorPanel = () => {
+            const { t } = useContext(LanguageContext);
+            const { queue, setQueue, inventory, setInventory } = useContext(GlobalStateContext);
+            const [tab, setTab] = useState('queue');
+            const [intakeTrack, setIntakeTrack] = useState(null);
+ 
+            const handleAction = (id, action) => {
+                if (action === 'noshow') alert('Öğrenci randevuya gelmedi olarak işaretlendi. 48 saat sistemden bloke edilecek.');
+                if (action === 'collect') alert('Teslimat başarıyla onaylandı!');
+                setQueue(queue.filter(q => q.id !== id));
+            };
+
+            const handleDonorItemAdd = (e) => {
+                e.preventDefault();
+                // Demo: Add new item to global inventory so student sees it instantly
+                const newItem = { id: Date.now(), cat: 3, size: 'M', gender: 'Unisex', type: 'barcode', code: 'ITU-COAT-NEW', status: 'Available' };
+                setInventory([newItem, ...inventory]);
+                alert('Yeni bağış başarıyla envantere eklendi ve vitrinde görünür hale geldi!');
+                setIntakeTrack(null);
+            };
+ 
+            return (
+                <div className="p-6 max-w-6xl mx-auto bg-gray-50 min-h-screen">
+                    <div className="flex gap-2 p-1.5 bg-gray-200 rounded-xl w-fit mb-8 shadow-inner">
+                        {['queue', 'intake'].map(v => (
+                            <button key={v} onClick={() => { setTab(v); setIntakeTrack(null); }}
+                                className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-all ${tab === v ? 'bg-white shadow-sm text-[#003865]' : 'text-gray-500 hover:text-gray-800'}`}>
+                                {v === 'queue' ? 'Gelen Rezervasyonlar' : 'Yeni Bağış Girişi'}
+                            </button>
+                        ))}
+                    </div>
+ 
+                    {tab === 'queue' && (
+                        <div>
+                            <div className="flex items-center gap-2 mb-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
+                                <span className="text-sm font-bold text-gray-700">{queue.length} adet işlem bekleyen rezervasyon var</span>
+                            </div>
+                            <div className="space-y-4">
+                                {queue.map(q => (
+                                    <div key={q.id} className="bg-white p-5 rounded-2xl border-2 border-gray-100 shadow-sm flex flex-col sm:flex-row gap-4 justify-between sm:items-center hover:border-blue-200 transition-colors">
+                                        <div className="flex items-start gap-4">
+                                            <div className="bg-blue-50 p-3 rounded-xl">
+                                                <Icon name="calendar-clock" className="w-6 h-6 text-[#003865]" />
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-1 rounded-md">{q.date} · {q.time}</span>
+                                                </div>
+                                                <h4 className="font-extrabold text-gray-900 font-mono text-sm">{q.studentCode}</h4>
+                                                <p className="text-sm font-medium text-gray-500 mt-1">{q.items}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <button onClick={() => handleAction(q.id, 'collect')}
+                                                className="flex-1 sm:flex-none bg-emerald-500 text-white px-4 py-2.5 rounded-xl font-bold shadow-md hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2" title={t.confirmPickup}>
+                                                <Icon name="check-circle" className="w-5 h-5" /> Onayla
+                                            </button>
+                                            <button onClick={() => handleAction(q.id, 'noshow')}
+                                                className="flex-1 sm:flex-none bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-bold hover:bg-red-200 transition-colors flex items-center justify-center gap-2" title={t.markNoShow}>
+                                                <Icon name="x-circle" className="w-5 h-5" /> Gelmedi
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {queue.length === 0 && (
+                                    <div className="bg-white border-2 border-dashed border-gray-200 rounded-3xl p-12 text-center">
+                                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Icon name="party-popper" className="w-8 h-8 text-gray-400" />
+                                        </div>
+                                        <p className="text-gray-400 font-bold text-lg">Bekleyen rezervasyon yok, harika iş çıkardın!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+ 
+                    {tab === 'intake' && !intakeTrack && (
+                        <div>
+                            <h3 className="font-bold text-xl text-gray-800 mb-6">Bağış Kabul Yöntemini Seçin</h3>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div onClick={() => setIntakeTrack('batch')}
+                                    className="bg-white p-8 rounded-3xl border-2 border-gray-100 shadow-sm hover:border-[#003865] hover:shadow-md cursor-pointer flex flex-col items-center group transition-all">
+                                    <div className="p-5 bg-blue-50 rounded-2xl mb-5 group-hover:bg-[#003865] group-hover:text-white transition-colors text-blue-600">
+                                        <Icon name="package-plus" className="w-10 h-10" />
+                                    </div>
+                                    <h4 className="font-extrabold text-lg text-gray-900">{t.batchTrack}</h4>
+                                    <p className="text-sm font-medium text-gray-500 mt-2 text-center">T-shirt, kazak gibi standart ürünler için hızlı toplu giriş.</p>
+                                </div>
+                                <div onClick={() => setIntakeTrack('barcode')}
+                                    className="bg-white p-8 rounded-3xl border-2 border-gray-100 shadow-sm hover:border-[#003865] hover:shadow-md cursor-pointer flex flex-col items-center group transition-all">
+                                    <div className="p-5 bg-purple-50 rounded-2xl mb-5 group-hover:bg-[#003865] group-hover:text-white transition-colors text-purple-600">
+                                        <Icon name="scan-line" className="w-10 h-10" />
+                                    </div>
+                                    <h4 className="font-extrabold text-lg text-gray-900">{t.barcodeTrack}</h4>
+                                    <p className="text-sm font-medium text-gray-500 mt-2 text-center">Kaban, bot gibi değerli ürünler için özel barkod tanımlama.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+ 
+                    {tab === 'intake' && intakeTrack === 'barcode' && (
+                        <div className="bg-white p-8 rounded-3xl border-2 border-gray-100 shadow-sm max-w-lg mx-auto">
+                            <button onClick={() => setIntakeTrack(null)} className="text-sm font-bold text-gray-400 mb-6 flex items-center gap-2 hover:text-[#003865]">
+                                <Icon name="arrow-left" className="w-4 h-4" /> Geri Dön
+                            </button>
+                            <h3 className="font-extrabold text-2xl text-gray-900 mb-6">Tekil Ürün Kaydı (Kaban/Bot)</h3>
+                            <form onSubmit={handleDonorItemAdd} className="space-y-5">
+                                <div className="bg-gray-50 border-2 border-dashed border-gray-200 p-5 rounded-2xl text-center">
+                                    <p className="text-xs text-gray-500 font-bold tracking-widest mb-2 uppercase">Sistem Barkodu</p>
+                                    <p className="text-2xl font-mono font-extrabold text-[#003865]">ITU-COAT-NEW</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 ml-1">Kategori</label>
+                                    <select className="w-full mt-1 p-3.5 border-2 border-gray-200 rounded-xl bg-white outline-none focus:border-[#003865] font-medium">
+                                        <option>Dış Giyim (Kaban/Mont)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 ml-1">Beden</label>
+                                    <input className="w-full mt-1 p-3.5 border-2 border-gray-200 rounded-xl bg-white outline-none focus:border-[#003865] font-medium" placeholder="Örn: M, L, 42" required />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 ml-1">Durum</label>
+                                    <select className="w-full mt-1 p-3.5 border-2 border-gray-200 rounded-xl bg-white outline-none focus:border-[#003865] font-medium">
+                                        <option>Yeni Gibi</option><option>İyi</option><option>Orta</option>
+                                    </select>
+                                </div>
+                                <button type="submit" className="w-full itu-blue text-white font-bold py-4 rounded-xl hover:bg-blue-900 transition-colors shadow-md mt-4">
+                                    Envantere Ekle ve Yayına Al
+                                </button>
+                            </form>
+                        </div>
+                    )}
+
+                    {tab === 'intake' && intakeTrack === 'batch' && (
+                        <div className="bg-white p-8 rounded-3xl border-2 border-gray-100 shadow-sm max-w-lg mx-auto">
+                            <button onClick={() => setIntakeTrack(null)} className="text-sm font-bold text-gray-400 mb-6 flex items-center gap-2 hover:text-[#003865]">
+                                <Icon name="arrow-left" className="w-4 h-4" /> Geri Dön
+                            </button>
+                            <h3 className="font-extrabold text-2xl text-gray-900 mb-6">Toplu Ürün Kaydı</h3>
+                            <p className="text-gray-500 mb-6">Bu modül üzerinden toplu girişleri sisteme tanımlayabilirsiniz.</p>
+                            <button onClick={() => setIntakeTrack(null)} className="w-full bg-gray-200 text-gray-700 font-bold py-4 rounded-xl hover:bg-gray-300 transition-colors">
+                                İptal Et
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+ 
+        const AdminDashboard = () => {
+            const { t } = useContext(LanguageContext);
+            const stats = [
+                { label: 'Toplam Stok', val: '842', icon: 'package', color: 'text-[#003865]', bg: 'bg-blue-50' },
+                { label: 'Dağıtılan', val: '156', icon: 'shopping-bag', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                { label: 'Gelmedi Oranı', val: '4.2%', icon: 'alert-triangle', color: 'text-red-500', bg: 'bg-red-50' },
+                { label: 'Gönüllüler', val: '12', icon: 'users', color: 'text-purple-600', bg: 'bg-purple-50' },
+                { label: 'Aktif Öğrenci', val: '450', icon: 'graduation-cap', color: 'text-amber-600', bg: 'bg-amber-50' },
+                { label: 'Bekleyen İstek', val: '23', icon: 'clock', color: 'text-slate-600', bg: 'bg-slate-50' },
+            ];
+            return (
+                <div className="p-6 max-w-6xl mx-auto bg-gray-50 min-h-screen">
+                    <div className="flex justify-between items-center mb-8">
+                        <h2 className="text-2xl font-extrabold text-gray-900">{t.kpis}</h2>
+                        <button className="bg-white border-2 border-gray-200 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm shadow-sm flex items-center gap-2 hover:border-[#003865] transition-colors">
+                            <Icon name="download" className="w-4 h-4" /> Rapor İndir (CSV)
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+                        {stats.map((s, i) => (
+                            <div key={i} className="bg-white p-6 rounded-2xl border-2 border-gray-100 shadow-sm hover:border-gray-300 transition-colors">
+                                <div className={`${s.bg} w-12 h-12 rounded-xl flex items-center justify-center mb-4`}>
+                                    <Icon name={s.icon} className={`w-6 h-6 ${s.color}`} />
+                                </div>
+                                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{s.label}</p>
+                                <p className="text-3xl font-black text-gray-900 mt-1">{s.val}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-white p-8 rounded-2xl border-2 border-gray-100 shadow-sm">
+                            <h3 className="font-extrabold text-lg text-gray-900 mb-6 flex items-center gap-2">
+                                <Icon name="users" className="w-5 h-5 text-[#003865]" /> Yeni Kullanıcı Ekle (Rol Yönetimi)
+                            </h3>
+                            <form className="space-y-4" onSubmit={e => { e.preventDefault(); alert('Kullanıcı başarıyla sisteme kaydedildi!'); e.target.reset(); }}>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 ml-1">İTÜ E-Posta</label>
+                                    <input className="w-full mt-1 p-3 border-2 border-gray-200 rounded-xl outline-none focus:border-[#003865]" placeholder="ornek@itu.edu.tr" required />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 ml-1">Sistem Rolü</label>
+                                    <select className="w-full mt-1 p-3 border-2 border-gray-200 rounded-xl outline-none focus:border-[#003865]">
+                                        <option>Öğrenci</option>
+                                        <option>Koordinatör</option>
+                                    </select>
+                                </div>
+                                <button className="w-full bg-[#003865] text-white font-bold p-3.5 rounded-xl hover:bg-blue-900 transition-colors shadow-md mt-2">
+                                    Sisteme Tanımla
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div className="bg-white p-8 rounded-2xl border-2 border-gray-100 shadow-sm">
+                            <h3 className="font-extrabold text-lg text-gray-900 mb-6 flex items-center gap-2">
+                                <Icon name="bar-chart-3" className="w-5 h-5 text-[#003865]" /> Kategori Dağılımı
+                            </h3>
+                            <div className="space-y-5">
+                                {[
+                                    ['Üst Giyim', 35, 'bg-blue-500'],
+                                    ['Dış Giyim', 25, 'bg-slate-700'],
+                                    ['Alt Giyim', 20, 'bg-emerald-500'],
+                                    ['Ayakkabı', 12, 'bg-amber-500'],
+                                    ['Aksesuar', 8, 'bg-purple-500'],
+                                ].map(([label, pct, color]) => (
+                                    <div key={label}>
+                                        <div className="flex justify-between text-sm font-bold mb-1.5">
+                                            <span className="text-gray-700">{label}</span>
+                                            <span className="text-gray-900">{pct}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 rounded-full h-2.5">
+                                            <div className={`${color} h-2.5 rounded-full`} style={{width: `${pct}%`}}></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+ 
+        const DonationForm = () => {
+            const { t } = useContext(LanguageContext);
+            const { setPage } = useContext(AuthContext);
+            return (
+                <div className="p-6 min-h-screen flex items-center justify-center bg-gray-50">
+                    <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl max-w-lg w-full">
+                        <button onClick={() => setPage('landing')} className="text-sm font-bold text-gray-400 mb-6 flex items-center gap-2 hover:text-[#003865] transition-colors">
+                            <Icon name="arrow-left" className="w-4 h-4" /> {t.backHome}
+                        </button>
+                        
+                        <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center mb-6">
+                            <Icon name="heart-handshake" className="w-7 h-7 text-rose-500" />
+                        </div>
+                        
+                        <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Bağış Giriş Formu</h2>
+                        <p className="text-gray-500 text-sm mb-8 font-medium">İTÜ İrem Vardar Giysi Odasına katkıda bulunmak için lütfen formu doldurun.</p>
+                        
+                        <form className="space-y-4" onSubmit={e => { e.preventDefault(); alert('Bağış talebiniz alındı! Koordinatörlerimiz en kısa sürede sizinle iletişime geçecektir. Teşekkür ederiz.'); setPage('landing'); }}>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 ml-1">Adınız</label>
+                                    <input className="w-full mt-1 p-3 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#003865] focus:bg-white transition-colors" required />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 ml-1">Soyadınız</label>
+                                    <input className="w-full mt-1 p-3 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#003865] focus:bg-white transition-colors" required />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 ml-1">E-Posta Adresi</label>
+                                <input className="w-full mt-1 p-3 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#003865] focus:bg-white transition-colors" type="email" required />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 ml-1">Bağış Detayı</label>
+                                <textarea className="w-full mt-1 p-3 border-2 border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#003865] focus:bg-white transition-colors h-28 resize-none"
+                                    placeholder="Örn: 2 adet L beden kışlık kaban, çok az kullanılmış." required />
+                            </div>
+                            <button className="w-full bg-[#34a853] text-white font-bold py-4 rounded-xl hover:bg-green-700 transition-colors shadow-md mt-4 text-lg">
+                                Bağış Talebini İlet
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+ 
+        const App = () => {
+            const [lang, setLang] = useState('tr');
+            const [user, setUser] = useState(null);
+            const [page, setPage] = useState('landing');
+            
+            // Global State for Presentation Flow
+            const [inventory, setInventory] = useState(INITIAL_INVENTORY);
+            const [myRes, setMyRes] = useState([]);
+            const [queue, setQueue] = useState(INITIAL_QUEUE);
+ 
+            const toggleLang = () => setLang(l => l === 'tr' ? 'en' : 'tr');
+            const t = translations[lang];
+ 
+            const login = (role) => { 
+                setUser({ role, name: `Demo ${role}` }); 
+                setPage(role); 
+            };
+            
+            const logout = () => { 
+                setUser(null); 
+                setPage('landing'); 
+            };
+ 
+            return (
+                <LanguageContext.Provider value={{ lang, t, toggleLang }}>
+                    <AuthContext.Provider value={{ user, login, logout, setPage }}>
+                        <GlobalStateContext.Provider value={{ inventory, setInventory, myRes, setMyRes, queue, setQueue }}>
+                            <div className="min-h-screen bg-gray-50">
+                                {page !== 'landing' && page !== 'donor' && <Header />}
+                                {page === 'landing' && <LandingPage />}
+                                {page === 'student' && <StudentDashboard />}
+                                {page === 'coordinator' && <CoordinatorPanel />}
+                                {page === 'admin' && <AdminDashboard />}
+                                {page === 'donor' && <DonationForm />}
+                            </div>
+                        </GlobalStateContext.Provider>
+                    </AuthContext.Provider>
+                </LanguageContext.Provider>
+            );
+        };
+ 
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

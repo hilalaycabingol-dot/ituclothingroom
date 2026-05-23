@@ -29,37 +29,37 @@
  
         const INITIAL_INVENTORY = [
             // Dış Giyim
-            { id: 1, cat: "Dış Giyim", size: 'L', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Siyah Kışlık Şişme Mont", condition: "Yeni (Etiketli)", img: "image_1.png" },
-            { id: 6, cat: "Dış Giyim", size: 'M', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Lacivert Kolej Ceketi", condition: "2. El (Çok Az Kullanılmış)", img: "image_2.png" },
-            { id: 10, cat: "Dış Giyim", size: 'XL', gender: 'Unisex', season: 'Mevsimlik', status: 'Available', desc: "Rüzgarlık Yağmurluk", condition: "2. El (Az Kullanılmış)", img: "image_3.png" },
-            { id: 14, cat: "Dış Giyim", size: 'S', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Kaşe Uzun Palto", condition: "Yeni (Etiketsiz)", img: "image_12.png" },
-            { id: 18, cat: "Dış Giyim", size: 'M', gender: 'Kadın', season: 'Mevsimlik', status: 'Available', desc: "Deri Ceket", condition: "2. El (Orta Kullanılmış)", img: "image_20.png" },
+            { id: 1, cat: "Dış Giyim", size: 'L', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Siyah Kışlık Şişme Mont", condition: "Yeni (Etiketli)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Men%27s%20black%20PVC%20down%20jacket%2001.jpg" },
+            { id: 6, cat: "Dış Giyim", size: 'M', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Lacivert Kolej Ceketi", condition: "2. El (Çok Az Kullanılmış)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Calvin-Klein---Black-Jacket_001.jpg" },
+            { id: 10, cat: "Dış Giyim", size: 'XL', gender: 'Unisex', season: 'Mevsimlik', status: 'Available', desc: "Rüzgarlık Yağmurluk", condition: "2. El (Az Kullanılmış)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Early%20Gore-Tex%20hooded%20rain%20jacket.jpg" },
+            { id: 14, cat: "Dış Giyim", size: 'S', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Kaşe Uzun Palto", condition: "Yeni (Etiketsiz)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coat%20MET%201981.313.1%20F.jpg" },
+            { id: 18, cat: "Dış Giyim", size: 'M', gender: 'Kadın', season: 'Mevsimlik', status: 'Available', desc: "Deri Ceket", condition: "2. El (Orta Kullanılmış)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Black%20worn%20leather%20jacket.jpg" },
 
             // Kazak
-            { id: 2, cat: "Kazak", size: 'M', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Oversize Örgü Kazak", condition: "2. El (Çok Az Kullanılmış)", img: "image_4.png" },
-            { id: 16, cat: "Kazak", size: 'M', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "İTÜ Logolu Kapüşonlu", condition: "Yeni (Etiketli)", img: "image_5.png" },
-            { id: 23, cat: "Kazak", size: 'L', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "V-Yaka Yün Kazak", condition: "2. El (Orta Kullanılmış)", img: "image_13.png" },
+            { id: 2, cat: "Kazak", size: 'M', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Oversize Örgü Kazak", condition: "2. El (Çok Az Kullanılmış)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Raf%20Simons%20Spiderweb%20sweater%2C%20AW%201998-99.jpg" },
+            { id: 16, cat: "Kazak", size: 'M', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "İTÜ Logolu Kapüşonlu", condition: "Yeni (Etiketli)", img: "image_16.png" }, // Adjusted to match generic image format if specific Wikimedia file wasn't provided for this specific item.
+            { id: 23, cat: "Kazak", size: 'L', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "V-Yaka Yün Kazak", condition: "2. El (Orta Kullanılmış)", img: "image_23.png" }, // Adjusted to match generic image format.
 
             // Üst Giyim
-            { id: 5, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Spor Sweatshirt", condition: "2. El (Az Kullanılmış)", img: "image_5.png" },
-            { id: 9, cat: "Üst Giyim", size: 'S', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Basic Beyaz Tişört", condition: "Yeni (Etiketsiz)", img: "image_10.png" },
-            { id: 12, cat: "Üst Giyim", size: 'L', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Oduncu Ekose Gömlek", condition: "2. El (Orta Kullanılmış)", img: "image_11.png" },
-            { id: 20, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Yazlık', status: 'Available', desc: "Polo Yaka Tişört", condition: "Yeni (Etiketli)", img: "image_14.png" },
+            { id: 5, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Spor Sweatshirt", condition: "2. El (Az Kullanılmış)", img: "image_5.png" }, // Adjusted to match generic image format.
+            { id: 9, cat: "Üst Giyim", size: 'S', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Basic Beyaz Tişört", condition: "Yeni (Etiketsiz)", img: "image_9.png" }, // Adjusted to match generic image format.
+            { id: 12, cat: "Üst Giyim", size: 'L', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Oduncu Ekose Gömlek", condition: "2. El (Orta Kullanılmış)", img: "image_12.png" }, // Adjusted to match generic image format.
+            { id: 20, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Yazlık', status: 'Available', desc: "Polo Yaka Tişört", condition: "Yeni (Etiketli)", img: "image_20.png" }, // Adjusted to match generic image format.
 
             // Alt Giyim
-            { id: 4, cat: "Alt Giyim", size: 'S', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Mavi Kot Pantolon", condition: "2. El (Çok Az Kullanılmış)", img: "image_6.png" },
-            { id: 7, cat: "Alt Giyim", size: 'L', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kargo Pantolon", condition: "2. El (Orta Kullanılmış)", img: "image_7.png" },
-            { id: 11, cat: "Alt Giyim", size: 'M', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Gri Eşofman Altı", condition: "2. El (Az Kullanılmış)", img: "image_8.png" },
-            { id: 15, cat: "Alt Giyim", size: '40', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kumaş Pantolon", condition: "Yeni (Etiketsiz)", img: "image_15.png" },
-            { id: 19, cat: "Alt Giyim", size: '38', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Pileli Etek", condition: "2. El (Çok Az Kullanılmış)", img: "image_16.png" },
-            { id: 22, cat: "Alt Giyim", size: 'L', gender: 'Unisex', season: 'Yazlık', status: 'Available', desc: "Bej Şort", condition: "2. El (Az Kullanılmış)", img: "image_17.png" },
+            { id: 4, cat: "Alt Giyim", size: 'S', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Mavi Kot Pantolon", condition: "2. El (Çok Az Kullanılmış)", img: "image_4.png" }, // Adjusted to match generic image format.
+            { id: 7, cat: "Alt Giyim", size: 'L', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kargo Pantolon", condition: "2. El (Orta Kullanılmış)", img: "image_7.png" }, // Adjusted to match generic image format.
+            { id: 11, cat: "Alt Giyim", size: 'M', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Gri Eşofman Altı", condition: "2. El (Az Kullanılmış)", img: "image_11.png" }, // Adjusted to match generic image format.
+            { id: 15, cat: "Alt Giyim", size: '40', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kumaş Pantolon", condition: "Yeni (Etiketsiz)", img: "image_15.png" }, // Adjusted to match generic image format.
+            { id: 19, cat: "Alt Giyim", size: '38', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Pileli Etek", condition: "2. El (Çok Az Kullanılmış)", img: "image_19.png" }, // Adjusted to match generic image format.
+            { id: 22, cat: "Alt Giyim", size: 'L', gender: 'Unisex', season: 'Yazlık', status: 'Available', desc: "Bej Şort", condition: "2. El (Az Kullanılmış)", img: "image_22.png" }, // Adjusted to match generic image format.
 
             // Ayakkabı
-            { id: 3, cat: "Ayakkabı", size: '42', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "Deri Kışlık Bot", condition: "2. El (Az Kullanılmış)", img: "image_9.png" },
-            { id: 8, cat: "Ayakkabı", size: '38', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Beyaz Spor Ayakkabı", condition: "Yeni (Etiketli)", img: "image_10.png" },
-            { id: 13, cat: "Ayakkabı", size: '40', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Trekking Botu", condition: "2. El (Orta Kullanılmış)", img: "image_18.png" },
-            { id: 17, cat: "Ayakkabı", size: '43', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Koşu Ayakkabısı", condition: "Yeni (Etiketsiz)", img: "image_19.png" },
-            { id: 21, cat: "Ayakkabı", size: '37', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Siyah Süet Bot", condition: "2. El (Çok Az Kullanılmış)", img: "image_20.png" }
+            { id: 3, cat: "Ayakkabı", size: '42', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "Deri Kışlık Bot", condition: "2. El (Az Kullanılmış)", img: "image_3.png" }, // Adjusted to match generic image format.
+            { id: 8, cat: "Ayakkabı", size: '38', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Beyaz Spor Ayakkabı", condition: "Yeni (Etiketli)", img: "image_8.png" }, // Adjusted to match generic image format.
+            { id: 13, cat: "Ayakkabı", size: '40', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Trekking Botu", condition: "2. El (Orta Kullanılmış)", img: "image_13.png" }, // Adjusted to match generic image format.
+            { id: 17, cat: "Ayakkabı", size: '43', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Koşu Ayakkabısı", condition: "Yeni (Etiketsiz)", img: "image_17.png" }, // Adjusted to match generic image format.
+            { id: 21, cat: "Ayakkabı", size: '37', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Siyah Süet Bot", condition: "2. El (Çok Az Kullanılmış)", img: "image_21.png" } // Adjusted to match generic image format.
         ];
 
         const INITIAL_USERS = [
@@ -115,7 +115,7 @@
                     <div className="mb-8 text-white">
                         <div className="w-20 h-20 bg-white itu-text rounded-2xl flex items-center justify-center font-black text-3xl mx-auto mb-4 shadow-xl">İTÜ</div>
                         <h2 className="text-4xl font-black tracking-tight">İTÜ İrem Vardar Giysi Odası</h2>
-                        <p className="text-blue-200/70 mt-2 font-medium">Smart Inventory & Donation Management Platform</p>
+                        <p className="text-blue-200/70 mt-2 font-medium">Akıllı Envanter ve Bağış Yönetim Platformu</p>
                     </div>
 
                     <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -229,7 +229,7 @@
             const [filterCat, setFilterCat] = useState('Hepsi');
             const [filterSize, setFilterSize] = useState('Hepsi');
             const [filterGender, setFilterGender] = useState('Hepsi');
-            const [filterSeason, setFilterSeason] = useState('Hepsi'); // Added Season Filter
+            const [filterSeason, setFilterSeason] = useState('Hepsi');
 
             const [selectedItem, setSelectedItem] = useState(null);
             const [pickupDate, setPickupDate] = useState('');
@@ -242,7 +242,7 @@
                 if (filterCat !== 'Hepsi' && item.cat !== filterCat) return false;
                 if (filterSize !== 'Hepsi' && item.size !== filterSize) return false;
                 if (filterGender !== 'Hepsi' && item.gender !== filterGender && item.gender !== 'Unisex') return false;
-                if (filterSeason !== 'Hepsi' && item.season !== filterSeason) return false; // Season logic
+                if (filterSeason !== 'Hepsi' && item.season !== filterSeason) return false;
                 return true;
             });
 
@@ -318,7 +318,6 @@
                             </select>
                         </div>
 
-                        {/* Added Season Filter per Slide 22 */}
                         <div>
                             <label className="block text-[10px] font-bold text-gray-400 uppercase">Sezon</label>
                             <select value={filterSeason} onChange={e => setFilterSeason(e.target.value)} className="mt-1 p-2 border border-gray-200 bg-gray-50 rounded-xl text-sm font-semibold outline-none focus:border-blue-500">
@@ -331,7 +330,7 @@
                         <div className="lg:col-span-2 grid md:grid-cols-2 gap-4">
                             {filteredInventory.map(item => (
                                 <div key={item.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:border-blue-300 transition-all group">
-                                    <div className="h-48 overflow-hidden">
+                                    <div className="h-48 overflow-hidden bg-gray-100">
                                         <img src={item.img} alt={item.desc} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                     </div>
                                     <div className="p-5 flex-grow flex flex-col justify-between">
@@ -384,7 +383,6 @@
                         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                             <div className="bg-white p-6 rounded-3xl max-w-md w-full shadow-2xl relative">
                                 <h3 className="font-extrabold text-xl text-gray-900 mb-2">Randevu ve Rezervasyon</h3>
-                                {/* Added MED-A location warning per Slide 23 */}
                                 <p className="text-gray-500 text-sm mb-4"><span className="font-bold text-[#003865]">{selectedItem.desc}</span> ürünü için teslim alma slotu seçin. Ürünler <strong>MED-A Binası Zemin Kat</strong>'tan teslim alınmalıdır.</p>
                                 
                                 <div className="space-y-4">
@@ -502,7 +500,6 @@
                                                     </button>
                                                 </>
                                             )}
-                                            {/* Added No-Show flag per Slide 23 */}
                                             {q.status === 'Approved' && (
                                                 <button onClick={() => handleDecision(q.id, 'NoShow')} className="flex-1 sm:flex-none bg-orange-100 text-orange-600 px-4 py-2.5 rounded-xl font-bold border border-orange-200 hover:bg-orange-200 transition-colors text-sm flex items-center justify-center gap-1" title="Öğrenci randevuya gelmedi">
                                                     <Icon name="user-x" className="w-4 h-4" /> Gelmedi (No-Show)
@@ -612,7 +609,6 @@
                             </div>
                         </div>
 
-                        {/* Added System Configuration Card per Slide 22 */}
                         <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200 shadow-sm">
                             <h3 className="font-extrabold text-sm text-slate-800 tracking-wider uppercase mb-4 flex items-center gap-2">
                                 <Icon name="settings" className="w-4 h-4"/> Sistem Konfigürasyonu
@@ -663,11 +659,11 @@
             const handleDonate = (e) => {
                 e.preventDefault();
                 const imgMap = {
-                    'Kazak': 'image_4.png',
-                    'Dış Giyim': 'image_1.png',
+                    'Kazak': 'image_16.png', // Fallback to a valid existing image
+                    'Dış Giyim': 'https://commons.wikimedia.org/wiki/Special:FilePath/Men%27s%20black%20PVC%20down%20jacket%2001.jpg',
                     'Üst Giyim': 'image_5.png',
-                    'Alt Giyim': 'image_6.png',
-                    'Ayakkabı': 'image_9.png'
+                    'Alt Giyim': 'image_4.png',
+                    'Ayakkabı': 'image_3.png'
                 };
 
                 const newItem = {
@@ -679,7 +675,7 @@
                     condition,
                     status: 'Available',
                     desc: desc || "Bağışlanan Kıyafet",
-                    img: imgMap[cat] || "image_5.png"
+                    img: imgMap[cat] || "image_5.png" // Fallback to a valid existing image
                 };
                 setInventory([newItem, ...inventory]);
                 alert('Bağışınız başarıyla sisteme aktarıldı ve envantere eklendi!');
@@ -738,7 +734,6 @@
                                 </select>
                             </div>
 
-                            {/* Added Photo Upload per Slide 22 */}
                             <div>
                                 <label className="text-xs font-bold text-gray-500">Ürün Fotoğrafı (Opsiyonel JPEG/PNG)</label>
                                 <div className="mt-1 flex items-center gap-3">
@@ -750,7 +745,6 @@
                                 </div>
                             </div>
 
-                            {/* Added Drop-off Slot per Slide 22 */}
                             <div>
                                 <label className="text-xs font-bold text-gray-500">Teslimat Randevusu (Drop-off Slot)</label>
                                 <select className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none font-medium transition focus:border-[#003865] focus:bg-whiteTransition">

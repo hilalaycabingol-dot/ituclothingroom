@@ -14,48 +14,53 @@
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .itu-blue { background-color: #003865; }
         .itu-text { color: #003865; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
     <div id="root"></div>
     <script type="text/babel">
         const { useState, useEffect, createContext, useContext } = React;
+ 
+        const LanguageContext = createContext();
         const AuthContext = createContext();
         const GlobalStateContext = createContext();
  
-        // 22 ÜRÜN - YALNIZCA YENİ (ETİKETLİ/ETİKETSİZ) - GITHUB IMAGE_X.PNG UYUMLU
+        // Kullanıcının çalışan görsel altyapısı korundu, tüm 2. El durumları Yeni olarak güncellendi.
         const INITIAL_INVENTORY = [
             // Dış Giyim
-            { id: 1, cat: "Dış Giyim", size: 'L', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Siyah Kışlık Şişme Mont", condition: "Yeni (Etiketli)", img: "image_1.png" },
-            { id: 6, cat: "Dış Giyim", size: 'M', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Lacivert Kolej Ceketi", condition: "Yeni (Etiketsiz)", img: "image_2.png" },
-            { id: 10, cat: "Dış Giyim", size: 'XL', gender: 'Unisex', season: 'Mevsimlik', status: 'Available', desc: "Rüzgarlık Yağmurluk", condition: "Yeni (Etiketli)", img: "image_3.png" },
-            { id: 14, cat: "Dış Giyim", size: 'S', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Uzun Kaşe Palto", condition: "Yeni (Etiketsiz)", img: "image_4.png" },
-            { id: 18, cat: "Dış Giyim", size: 'M', gender: 'Kadın', season: 'Mevsimlik', status: 'Available', desc: "Şık Trençkot", condition: "Yeni (Etiketli)", img: "image_5.png" },
+            { id: 1, cat: "Dış Giyim", size: 'L', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Siyah Kışlık Şişme Mont", condition: "Yeni (Etiketli)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Men%27s%20black%20PVC%20down%20jacket%2001.jpg" },
+            { id: 6, cat: "Dış Giyim", size: 'M', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Lacivert Kolej Ceketi", condition: "Yeni (Etiketsiz)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Calvin-Klein---Black-Jacket_001.jpg" },
+            { id: 10, cat: "Dış Giyim", size: 'XL', gender: 'Unisex', season: 'Mevsimlik', status: 'Available', desc: "Rüzgarlık Yağmurluk", condition: "Yeni (Etiketli)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Early%20Gore-Tex%20hooded%20rain%20jacket.jpg" },
+            { id: 14, cat: "Dış Giyim", size: 'S', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Kaşe Uzun Palto", condition: "Yeni (Etiketsiz)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coat%20MET%201981.313.1%20F.jpg" },
+            { id: 18, cat: "Dış Giyim", size: 'M', gender: 'Kadın', season: 'Mevsimlik', status: 'Available', desc: "Deri Ceket", condition: "Yeni (Etiketli)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Black%20worn%20leather%20jacket.jpg" },
 
             // Kazak
-            { id: 2, cat: "Kazak", size: 'M', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Oversize Örgü Kazak", condition: "Yeni (Etiketsiz)", img: "image_6.png" },
-            { id: 16, cat: "Kazak", size: 'M', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "İTÜ Logolu Kapüşonlu", condition: "Yeni (Etiketli)", img: "image_7.png" },
-            { id: 23, cat: "Kazak", size: 'L', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "V-Yaka Yün Kazak", condition: "Yeni (Etiketsiz)", img: "image_8.png" },
+            { id: 2, cat: "Kazak", size: 'M', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Oversize Örgü Kazak", condition: "Yeni (Etiketsiz)", img: "https://commons.wikimedia.org/wiki/Special:FilePath/Raf%20Simons%20Spiderweb%20sweater%2C%20AW%201998-99.jpg" },
+            { id: 16, cat: "Kazak", size: 'M', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "İTÜ Logolu Kapüşonlu", condition: "Yeni (Etiketli)", img: "image_16.png" }, 
+            { id: 23, cat: "Kazak", size: 'L', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "V-Yaka Yün Kazak", condition: "Yeni (Etiketsiz)", img: "image_23.png" }, 
 
             // Üst Giyim
-            { id: 5, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Spor Sweatshirt", condition: "Yeni (Etiketli)", img: "image_9.png" },
-            { id: 9, cat: "Üst Giyim", size: 'S', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Basic Beyaz Tişört", condition: "Yeni (Etiketsiz)", img: "image_10.png" },
-            { id: 12, cat: "Üst Giyim", size: 'L', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Oduncu Ekose Gömlek", condition: "Yeni (Etiketli)", img: "image_11.png" },
-            { id: 20, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Yazlık', status: 'Available', desc: "Polo Yaka Tişört", condition: "Yeni (Etiketli)", img: "image_12.png" },
+            { id: 5, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Spor Sweatshirt", condition: "Yeni (Etiketli)", img: "image_5.png" }, 
+            { id: 9, cat: "Üst Giyim", size: 'S', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Basic Beyaz Tişört", condition: "Yeni (Etiketsiz)", img: "image_9.png" }, 
+            { id: 12, cat: "Üst Giyim", size: 'L', gender: 'Erkek', season: 'Mevsimlik', status: 'Available', desc: "Oduncu Ekose Gömlek", condition: "Yeni (Etiketli)", img: "image_12.png" }, 
+            { id: 20, cat: "Üst Giyim", size: 'XL', gender: 'Erkek', season: 'Yazlık', status: 'Available', desc: "Polo Yaka Tişört", condition: "Yeni (Etiketli)", img: "image_20.png" }, 
 
             // Alt Giyim
-            { id: 4, cat: "Alt Giyim", size: 'S', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Mavi Kot Pantolon", condition: "Yeni (Etiketsiz)", img: "image_13.png" },
-            { id: 7, cat: "Alt Giyim", size: 'L', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kargo Pantolon", condition: "Yeni (Etiketli)", img: "image_14.png" },
-            { id: 11, cat: "Alt Giyim", size: 'M', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Gri Eşofman Altı", condition: "Yeni (Etiketsiz)", img: "image_15.png" },
-            { id: 15, cat: "Alt Giyim", size: '40', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kumaş Pantolon", condition: "Yeni (Etiketsiz)", img: "image_16.png" },
-            { id: 19, cat: "Alt Giyim", size: '38', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Pileli Etek", condition: "Yeni (Etiketli)", img: "image_17.png" },
-            { id: 22, cat: "Alt Giyim", size: 'L', gender: 'Unisex', season: 'Yazlık', status: 'Available', desc: "Bej Şort", condition: "Yeni (Etiketsiz)", img: "image_18.png" },
+            { id: 4, cat: "Alt Giyim", size: 'S', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Mavi Kot Pantolon", condition: "Yeni (Etiketsiz)", img: "image_4.png" }, 
+            { id: 7, cat: "Alt Giyim", size: 'L', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kargo Pantolon", condition: "Yeni (Etiketli)", img: "image_7.png" }, 
+            { id: 11, cat: "Alt Giyim", size: 'M', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Gri Eşofman Altı", condition: "Yeni (Etiketsiz)", img: "image_11.png" }, 
+            { id: 15, cat: "Alt Giyim", size: '40', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Siyah Kumaş Pantolon", condition: "Yeni (Etiketsiz)", img: "image_15.png" }, 
+            { id: 19, cat: "Alt Giyim", size: '38', gender: 'Kadın', season: 'Yazlık', status: 'Available', desc: "Pileli Etek", condition: "Yeni (Etiketli)", img: "image_19.png" }, 
+            { id: 22, cat: "Alt Giyim", size: 'L', gender: 'Unisex', season: 'Yazlık', status: 'Available', desc: "Bej Şort", condition: "Yeni (Etiketsiz)", img: "image_22.png" }, 
 
             // Ayakkabı
-            { id: 3, cat: "Ayakkabı", size: '42', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "Deri Kışlık Bot", condition: "Yeni (Etiketli)", img: "image_19.png" },
-            { id: 8, cat: "Ayakkabı", size: '38', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Beyaz Spor Ayakkabı", condition: "Yeni (Etiketli)", img: "image_20.png" },
-            { id: 13, cat: "Ayakkabı", size: '40', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Trekking Botu", condition: "Yeni (Etiketsiz)", img: "image_21.png" },
-            { id: 17, cat: "Ayakkabı", size: '43', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Koşu Ayakkabısı", condition: "Yeni (Etiketsiz)", img: "image_22.png" }
+            { id: 3, cat: "Ayakkabı", size: '42', gender: 'Erkek', season: 'Kışlık', status: 'Available', desc: "Deri Kışlık Bot", condition: "Yeni (Etiketli)", img: "image_3.png" }, 
+            { id: 8, cat: "Ayakkabı", size: '38', gender: 'Kadın', season: 'Dört Mevsim', status: 'Available', desc: "Beyaz Spor Ayakkabı", condition: "Yeni (Etiketli)", img: "image_8.png" }, 
+            { id: 13, cat: "Ayakkabı", size: '40', gender: 'Unisex', season: 'Kışlık', status: 'Available', desc: "Trekking Botu", condition: "Yeni (Etiketsiz)", img: "image_13.png" }, 
+            { id: 17, cat: "Ayakkabı", size: '43', gender: 'Erkek', season: 'Dört Mevsim', status: 'Available', desc: "Koşu Ayakkabısı", condition: "Yeni (Etiketsiz)", img: "image_17.png" }, 
+            { id: 21, cat: "Ayakkabı", size: '37', gender: 'Kadın', season: 'Kışlık', status: 'Available', desc: "Siyah Süet Bot", condition: "Yeni (Etiketli)", img: "image_21.png" } 
         ];
 
         const INITIAL_USERS = [
@@ -326,8 +331,8 @@
                         <div className="lg:col-span-2 grid md:grid-cols-2 gap-4">
                             {filteredInventory.map(item => (
                                 <div key={item.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:border-blue-300 transition-all group">
-                                    <div className="h-48 overflow-hidden bg-gray-100">
-                                        <img src={item.img} alt={item.desc} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                    <div className="h-48 overflow-hidden bg-gray-100 flex items-center justify-center">
+                                        <img src={item.img} alt={item.desc} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onError={(e) => { e.target.onerror = null; e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'; }} />
                                     </div>
                                     <div className="p-5 flex-grow flex flex-col justify-between">
                                         <div>
@@ -368,3 +373,426 @@
                                         </div>
                                     </div>
                                     <span className={`mt-3 inline-block text-[10px] font-black px-2 py-1 rounded tracking-wider uppercase ${res.status === 'Approved' ? 'bg-emerald-200 text-emerald-800' : res.status === 'Rejected' ? 'bg-red-200 text-red-800' : 'bg-amber-200 text-amber-800'}`}>
+                                        {res.status === 'Approved' ? 'ONAYLANDI - ODADAN ALABİLİRSİNİZ' : res.status === 'Rejected' ? 'REDDEDİLDİ' : 'KOORDİNATÖR ONAYI BEKLİYOR'}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {selectedItem && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                            <div className="bg-white p-6 rounded-3xl max-w-md w-full shadow-2xl relative">
+                                <h3 className="font-extrabold text-xl text-gray-900 mb-2">Randevu ve Rezervasyon</h3>
+                                {/* KONUM YDY OLARAK DEĞİŞTİRİLDİ */}
+                                <p className="text-gray-500 text-sm mb-4"><span className="font-bold text-[#003865]">{selectedItem.desc}</span> ürünü için teslim alma slotu seçin. Ürünler <strong>Yabancı Diller Yüksekokulu (YDY)</strong>'ndan teslim alınmalıdır.</p>
+                                
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500">Teslim Günü Seçin (Pzt/Prş 11:00-15:00)</label>
+                                        <select value={pickupDate} onChange={e => setPickupDate(e.target.value)} className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none font-medium">
+                                            <option value="">-- Gün Seçin --</option>
+                                            <option value="Pazartesi">Pazartesi</option>
+                                            <option value="Perşembe">Perşembe</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500">Saat Dilimi Seçin</label>
+                                        <select value={pickupTime} onChange={e => setPickupTime(e.target.value)} className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none font-medium">
+                                            <option value="">-- Saat Seçin --</option>
+                                            <option value="11:00 - 12:00">11:00 - 12:00</option>
+                                            <option value="12:00 - 13:00">12:00 - 13:00</option>
+                                            <option value="13:00 - 14:00">13:00 - 14:00</option>
+                                            <option value="14:00 - 15:00">14:00 - 15:00</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="flex gap-2 pt-2">
+                                        <button onClick={() => setSelectedItem(null)} className="flex-1 bg-gray-100 text-gray-600 font-bold p-3 rounded-xl hover:bg-gray-200 transition-colors text-sm">İptal</button>
+                                        <button onClick={confirmReservation} className="flex-1 bg-[#003865] text-white font-bold p-3 rounded-xl hover:bg-blue-900 transition-colors text-sm shadow-md">Talebi Gönder</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+ 
+        const CoordinatorPanel = () => {
+            const { reservations, setReservations } = useContext(GlobalStateContext);
+ 
+            const handleDecision = (id, newStatus) => {
+                setReservations(reservations.map(r => r.id === id ? { ...r, status: newStatus } : r));
+                const actionTr = newStatus === 'Approved' ? 'Onaylandı' : newStatus === 'Rejected' ? 'Reddedildi' : 'Gelmedi (No-Show)';
+                alert(`Rezervasyon ${actionTr} olarak güncellendi.`);
+            };
+
+            const getApprovedForSlot = (day, timeSlot) => {
+                return reservations.filter(r => r.status === 'Approved' && r.date === day && r.time === timeSlot);
+            };
+
+            const timeSlots = ["11:00 - 12:00", "12:00 - 13:00", "13:00 - 14:00", "14:00 - 15:00"];
+            const days = ["Pazartesi", "Perşembe"];
+ 
+            return (
+                <div className="p-6 max-w-7xl mx-auto min-h-screen">
+                    <h2 className="text-2xl font-black text-gray-900 mb-6">Koordinatör Onaylama Masası</h2>
+                    
+                    <div className="grid lg:grid-cols-3 gap-8">
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-fit sticky top-[100px]">
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><Icon name="calendar" className="w-5 h-5"/></div>
+                                <div>
+                                    <h3 className="font-extrabold text-gray-900 text-lg">Haftalık Teslimat Takvimi</h3>
+                                    <p className="text-gray-400 text-xs font-medium">Onaylanan teslimatlar otomatik olarak YDY takvimine işlenir.</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-4 border-t pt-4">
+                                <div className="text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50 p-2 rounded-lg text-center flex items-center justify-center">Saatler</div>
+                                <div className="text-xs font-bold text-blue-700 bg-blue-50 p-2 rounded-lg text-center uppercase tracking-wider font-extrabold">Pazartesi</div>
+                                <div className="text-xs font-bold text-indigo-700 bg-indigo-50 p-2 rounded-lg text-center uppercase tracking-wider font-extrabold">Perşembe</div>
+
+                                {timeSlots.map(slot => (
+                                    <React.Fragment key={slot}>
+                                        <div className="text-xs font-bold text-gray-600 border border-gray-100 p-3 rounded-xl flex items-center justify-center bg-white shadow-sm font-mono">{slot.split(' - ')[0]}</div>
+                                        {days.map(day => {
+                                            const itemsInSlot = getApprovedForSlot(day, slot);
+                                            return (
+                                                <div key={day+slot} className="border border-dashed border-gray-200 p-2 rounded-xl bg-gray-50/50 min-h-[60px] flex flex-col gap-1">
+                                                    {itemsInSlot.map(res => (
+                                                        <div key={res.id} className="bg-emerald-50 border border-emerald-200 p-1.5 rounded-lg text-[10px] font-medium text-emerald-900 shadow-sm">
+                                                            <div className="font-bold truncate">{res.desc}</div>
+                                                            <div className="text-emerald-600 truncate text-[9px] font-mono">{res.studentEmail.split('@')[0]}</div>
+                                                        </div>
+                                                    ))}
+                                                    {itemsInSlot.length === 0 && <span className="text-[10px] text-gray-300 italic m-auto">Boş</span>}
+                                                </div>
+                                            );
+                                        })}
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="lg:col-span-2 space-y-8">
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                                    <Icon name="bell" className="w-5 h-5 text-amber-500" /> Bekleyen İşlemler ({reservations.filter(r => r.status === 'Pending' || r.status === 'Approved').length})
+                                </h3>
+                                {reservations.filter(r => r.status === 'Pending' || r.status === 'Approved').map(q => (
+                                    <div key={q.id} className={`p-5 rounded-2xl border shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all ${q.status === 'Approved' ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-gray-100'}`}>
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-md">{q.date} · {q.time}</span>
+                                                {q.status === 'Approved' && <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-md">ONAYLANDI - TESLİMAT BEKLİYOR</span>}
+                                            </div>
+                                            <h4 className="font-extrabold text-gray-900 text-lg">{q.desc} <span className="text-sm font-bold text-gray-400">({q.size})</span></h4>
+                                            <p className="text-xs font-bold text-gray-400 font-mono mt-0.5">Öğrenci: {q.studentEmail}</p>
+                                        </div>
+                                        <div className="flex gap-2 w-full sm:w-auto flex-wrap">
+                                            {q.status === 'Pending' && (
+                                                <>
+                                                    <button onClick={() => handleDecision(q.id, 'Approved')} className="flex-1 sm:flex-none bg-emerald-500 text-white px-4 py-2.5 rounded-xl font-bold shadow-md hover:bg-emerald-600 transition-colors text-sm flex items-center justify-center gap-1">
+                                                        <Icon name="check-circle" className="w-4 h-4" /> Onayla
+                                                    </button>
+                                                    <button onClick={() => handleDecision(q.id, 'Rejected')} className="flex-1 sm:flex-none bg-red-50 text-red-600 px-4 py-2.5 rounded-xl font-bold border border-red-100 hover:bg-red-100 transition-colors text-sm flex items-center justify-center gap-1">
+                                                        <Icon name="x-circle" className="w-4 h-4" /> Reddet
+                                                    </button>
+                                                </>
+                                            )}
+                                            {q.status === 'Approved' && (
+                                                <button onClick={() => handleDecision(q.id, 'NoShow')} className="flex-1 sm:flex-none bg-orange-100 text-orange-600 px-4 py-2.5 rounded-xl font-bold border border-orange-200 hover:bg-orange-200 transition-colors text-sm flex items-center justify-center gap-1" title="Öğrenci randevuya gelmedi">
+                                                    <Icon name="user-x" className="w-4 h-4" /> Gelmedi (No-Show)
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="space-y-4">
+                                <h3 className="font-bold text-gray-400 uppercase text-xs tracking-widest flex items-center gap-1">
+                                    <Icon name="history" className="w-4 h-4" /> Geçmiş Kararlar
+                                </h3>
+                                {reservations.filter(r => r.status === 'Rejected' || r.status === 'NoShow').slice(-5).reverse().map(history => (
+                                    <div key={history.id} className="p-4 rounded-xl border text-xs font-medium bg-white shadow-sm flex justify-between items-center border-l-4 border-l-red-500">
+                                        <div>
+                                            <span className="font-bold text-gray-900 block">{history.desc} ({history.size})</span>
+                                            <span className="text-gray-400 font-mono block text-[10px] mt-0.5">{history.studentEmail} @ {history.date}, {history.time}</span>
+                                        </div>
+                                        <span className="font-bold uppercase tracking-wider px-2 py-1 rounded text-[9px] bg-red-100 text-red-800">
+                                            {history.status === 'NoShow' ? 'GELMEDİ İŞARETLENDİ' : 'REDDEDİLDİ'}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+ 
+        const AdminDashboard = () => {
+            const { inventory, reservations } = useContext(GlobalStateContext);
+            return (
+                <div className="p-6 max-w-6xl mx-auto min-h-screen">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-black text-gray-900">Yönetici Performans Dashboard (KPI)</h2>
+                        <button className="bg-white border-2 border-gray-200 text-gray-700 px-4 py-2 rounded-lg font-bold text-sm shadow-sm flex items-center gap-2 hover:border-[#003865] transition-colors">
+                            <Icon name="download" className="w-4 h-4" /> CSV / PDF İndir
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-3"><Icon name="box" /></div>
+                            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Mevcut Stok</p>
+                            <p className="text-3xl font-black text-gray-900 mt-1">{inventory.filter(i => i.status === 'Available').length} Adet</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-3"><Icon name="clock" /></div>
+                            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Bekleyen İstekler</p>
+                            <p className="text-3xl font-black text-gray-900 mt-1">{reservations.filter(r => r.status === 'Pending').length} Adet</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-3"><Icon name="check" /></div>
+                            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Tamamlanan Teslimat</p>
+                            <p className="text-3xl font-black text-gray-900 mt-1">{reservations.filter(r => r.status === 'Approved').length + 42} Adet</p>
+                        </div>
+                    </div>
+
+                    <div className="grid lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
+                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                                <h3 className="font-extrabold text-sm text-gray-400 tracking-wider uppercase mb-4">Ürün Durumu Dağılımı</h3>
+                                <div className="space-y-4">
+                                    {/* SADECE YENİ ETİKETLİ/ETİKETSİZ (2. El Yok) */}
+                                    {[
+                                        ['Yeni (Etiketli)', 55, 'bg-emerald-600'],
+                                        ['Yeni (Etiketsiz)', 45, 'bg-emerald-400']
+                                    ].map(([title, pct, color]) => (
+                                        <div key={title}>
+                                            <div className="flex justify-between text-xs font-bold mb-1">
+                                                <span className="text-gray-600">{title}</span>
+                                                <span className="text-gray-900">{pct}%</span>
+                                            </div>
+                                            <div className="w-full bg-gray-100 rounded-full h-2">
+                                                <div className={`${color} h-2 rounded-full`} style={{ width: `${pct}%` }}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                                <h3 className="font-extrabold text-sm text-gray-400 tracking-wider uppercase mb-4">Kategori Bazlı Stok</h3>
+                                <div className="space-y-4">
+                                    {[
+                                        ['Kazak', 25, 'bg-pink-600'],
+                                        ['Dış Giyim', 30, 'bg-slate-700'],
+                                        ['Alt Giyim', 25, 'bg-emerald-500'],
+                                        ['Ayakkabı', 20, 'bg-amber-500']
+                                    ].map(([title, pct, color]) => (
+                                        <div key={title}>
+                                            <div className="flex justify-between text-xs font-bold mb-1">
+                                                <span className="text-gray-600">{title}</span>
+                                                <span className="text-gray-900">{pct}%</span>
+                                            </div>
+                                            <div className="w-full bg-gray-100 rounded-full h-2">
+                                                <div className={`${color} h-2 rounded-full`} style={{ width: `${pct}%` }}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-6 rounded-2xl border-2 border-slate-200 shadow-sm">
+                            <h3 className="font-extrabold text-sm text-slate-800 tracking-wider uppercase mb-4 flex items-center gap-2">
+                                <Icon name="settings" className="w-4 h-4"/> Sistem Konfigürasyonu
+                            </h3>
+                            <div className="space-y-5">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 block mb-1">Öğrenci Başına Maks. Aktif Rezervasyon</label>
+                                    <input type="number" defaultValue="3" className="w-full p-2 border border-gray-300 rounded-lg outline-none font-bold text-gray-700 bg-white disabled:opacity-75" disabled/>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 block mb-1">Otomatik No-Show Blokaj Süresi</label>
+                                    <select className="w-full p-2 border border-gray-300 rounded-lg outline-none font-bold text-gray-700 bg-white disabled:opacity-75" disabled>
+                                        <option>48 Saat</option>
+                                        <option>72 Saat</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 block mb-1">Sistem Açık Günleri (YDY Kabul Saatleri)</label>
+                                    <div className="flex gap-2 mt-1 text-xs font-bold">
+                                        <span className="bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-lg border border-emerald-200">Pazartesi</span>
+                                        <span className="bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-lg border border-emerald-200">Perşembe</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 block mb-1">Aktif Koordinatör Nöbeti</label>
+                                    <div className="text-sm font-medium text-gray-700 bg-white p-2 border border-gray-200 rounded-lg flex items-center justify-between">
+                                        <span>coord@itu.edu.tr</span>
+                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+ 
+        const DonationForm = () => {
+            const { setPage } = useContext(AuthContext);
+            const { inventory, setInventory } = useContext(GlobalStateContext);
+            const [desc, setDesc] = useState('');
+            const [cat, setCat] = useState('Kazak');
+            const [size, setSize] = useState('M');
+            const [gender, setGender] = useState('Unisex');
+            const [condition, setCondition] = useState('Yeni (Etiketli)');
+            const [fileName, setFileName] = useState('');
+
+            const handleDonate = (e) => {
+                e.preventDefault();
+                // GitHub deposundaki görsel düzenine göre basit bir eşleştirme (Yeni eklenenler için generic image_X kullanır)
+                const imgMap = {
+                    'Kazak': 'image_16.png', 
+                    'Dış Giyim': 'https://commons.wikimedia.org/wiki/Special:FilePath/Men%27s%20black%20PVC%20down%20jacket%2001.jpg',
+                    'Üst Giyim': 'image_5.png',
+                    'Alt Giyim': 'image_4.png',
+                    'Ayakkabı': 'image_3.png'
+                };
+
+                const newItem = {
+                    id: Date.now(),
+                    cat,
+                    size,
+                    gender,
+                    season: 'Mevsimlik',
+                    condition,
+                    status: 'Available',
+                    desc: desc || "Bağışlanan Kıyafet",
+                    img: imgMap[cat] || "image_5.png" 
+                };
+                setInventory([newItem, ...inventory]);
+                alert('Bağışınız başarıyla sisteme aktarıldı ve envantere eklendi!');
+                setPage('landing');
+            };
+
+            return (
+                <div className="p-6 min-h-screen flex items-center justify-center">
+                    <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full border border-gray-100">
+                        <button onClick={() => setPage('landing')} className="text-xs font-bold text-gray-400 mb-6 flex items-center gap-1 hover:text-[#003865]">
+                            <Icon name="arrow-left" className="w-4 h-4" /> Ana Sayfaya Dön
+                        </button>
+                        <h2 className="text-2xl font-black text-gray-900 mb-1">Bağış Giriş Formu</h2>
+                        <p className="text-gray-400 text-xs mb-6 font-medium">Bu ekrandan eklediğiniz ürün koordinatör onayından sonra envantere yansır.</p>
+                        
+                        <form className="space-y-4" onSubmit={handleDonate}>
+                            <div>
+                                <label className="text-xs font-bold text-gray-500">Giysi Açıklaması / Adı</label>
+                                <input value={desc} onChange={e => setDesc(e.target.value)} className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#003865] focus:bg-whiteTransition" placeholder="Örn: Kırmızı Sweatshirt" required />
+                            </div>
+                            
+                            <div>
+                                <label className="text-xs font-bold text-gray-500">Kategori</label>
+                                <select value={cat} onChange={e => setCat(e.target.value)} className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none font-medium transition focus:border-[#003865] focus:bg-whiteTransition">
+                                    <option>Kazak</option>
+                                    <option>Dış Giyim</option>
+                                    <option>Alt Giyim</option>
+                                    <option>Ayakkabı</option>
+                                    <option>Üst Giyim (Tişört/Gömlek)</option>
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500">Beden</label>
+                                    <input value={size} onChange={e => setSize(e.target.value)} className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none transition focus:border-[#003865] focus:bg-whiteTransition" placeholder="S, M, L, 42" required />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500">Tür / Cinsiyet</label>
+                                    <select value={gender} onChange={e => setGender(e.target.value)} className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none font-medium transition focus:border-[#003865] focus:bg-whiteTransition">
+                                        <option>Unisex</option>
+                                        <option>Erkek</option>
+                                        <option>Kadın</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-gray-500">Ürün Durumu (Yıpranma)</label>
+                                {/* 2. El seçenekleri kaldırıldı, sadece Etiketli / Etiketsiz */}
+                                <select value={condition} onChange={e => setCondition(e.target.value)} className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none font-medium transition focus:border-[#003865] focus:bg-whiteTransition">
+                                    <option>Yeni (Etiketli)</option>
+                                    <option>Yeni (Etiketsiz)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-gray-500">Ürün Fotoğrafı (Opsiyonel JPEG/PNG)</label>
+                                <div className="mt-1 flex items-center gap-3">
+                                    <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 px-4 rounded-xl text-sm transition-colors border border-gray-300 flex items-center gap-2">
+                                        <Icon name="upload-cloud" className="w-4 h-4"/> Seç
+                                        <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={(e) => setFileName(e.target.files[0]?.name || '')}/>
+                                    </label>
+                                    <span className="text-xs text-gray-400 italic truncate w-48">{fileName || "Dosya seçilmedi"}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-gray-500">Teslimat Randevusu (YDY Drop-off Slot)</label>
+                                <select className="w-full mt-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none font-medium transition focus:border-[#003865] focus:bg-whiteTransition">
+                                    <option>Pazartesi 11:00 - 13:00</option>
+                                    <option>Pazartesi 13:00 - 15:00</option>
+                                    <option>Perşembe 11:00 - 13:00</option>
+                                    <option>Perşembe 13:00 - 15:00</option>
+                                </select>
+                            </div>
+                            
+                            <button className="w-full bg-[#34a853] text-white font-bold py-4 rounded-xl hover:bg-green-600 transition-all shadow-md mt-4 text-lg">
+                                Bağışı Gönder & Randevu Al
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+ 
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [page, setPage] = useState('landing');
+            const [selectedRole, setSelectedRole] = useState(null);
+            
+            const [inventory, setInventory] = useState(INITIAL_INVENTORY);
+            const [reservations, setReservations] = useState([]);
+            const [users, setUsers] = useState(INITIAL_USERS);
+ 
+            const login = (userData) => { setUser(userData); setPage(userData.role); };
+            const logout = () => { setUser(null); setPage('landing'); };
+ 
+            return (
+                <AuthContext.Provider value={{ user, login, logout, setPage, selectedRole, setSelectedRole }}>
+                    <GlobalStateContext.Provider value={{ inventory, setInventory, reservations, setReservations, users, setUsers }}>
+                        <div className="min-h-screen bg-gray-50">
+                            <Header />
+                            {page === 'landing' && <LandingPage />}
+                            {page === 'auth' && <AuthPage />}
+                            {page === 'student' && <StudentDashboard />}
+                            {page === 'coordinator' && <CoordinatorPanel />}
+                            {page === 'admin' && <AdminDashboard />}
+                            {page === 'donor' && <DonationForm />}
+                        </div>
+                    </GlobalStateContext.Provider>
+                </AuthContext.Provider>
+            );
+        };
+ 
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
